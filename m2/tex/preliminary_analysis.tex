@@ -1,0 +1,25 @@
+\section{Preliminary Analysis}
+
+Our preliminary analysis builds upon the findings reported by \cite{zheng_2020_aieconomist}, that the two-level reinforcement learning framework can capture complex dynamics. Specifically, the following observations were made:
+
+\begin{itemize}
+    \item \textbf{Agents' Adaptive Behavior:}
+    \begin{itemize}
+        \item  Agents naturally exhibit specialization, where lower-skilled agents tend to focus on resource collection while higher-skilled agents emphasize building. This division of labor is a key emergent property observed in the simulation.
+        \item  Agents dynamically adjust their strategies in response to the imposed tax schedule, demonstrating the non-stationarity of the inner-loop MDP and confirming that individual behaviors are influenced by external economic incentives.
+    \end{itemize}
+    
+    \item \textbf{Impact of Tax Policies on Social Welfare:}
+    \begin{itemize}
+        \item The RL-based planner is capable of setting tax policies that strike an effective balance between income equality and overall productivity. They report that the AI-driven tax policy achieves approximately a 16\% improvement in the product of equality and productivity relative to baseline methods.
+        \item The simulation reveals that agents sometimes engage in tax-gaming strategies, such as alternating between high and low income periods, in order to reduce their effective tax burdens.
+    \end{itemize}
+    
+    \item \textbf{Convergence and Stability:}
+    \begin{itemize}
+        \item  Curriculum learning and entropy regularization was crucial in stabilizing the training process. These techniques help both the agents and the planner converge to stable policies despite the inherent non-stationarity.
+        \item The planner's ability to adjust tax policies based on aggregated economic indicators (e.g., wealth distribution, overall productivity) ensures that the outer-loop MDP effectively guides the inner-loop dynamics towards improved social welfare outcomes.
+    \end{itemize}
+\end{itemize}
+
+Building on the concepts given in the work of \cite{zheng_2020_aieconomist}, our project aims to adapt the methodology for doing economic simulations, with some modifications on the training process regarding compute power availability.

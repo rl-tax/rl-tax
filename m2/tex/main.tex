@@ -1,0 +1,57 @@
+\documentclass{article}
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading project
+% ready for submission
+\usepackage[preprint]{zsupport/project}
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{project}
+
+\input{zsupport/algo}
+\input{zsupport/english}
+\input{zsupport/figure}
+\input{zsupport/linking}
+\input{zsupport/math}
+\input{zsupport/mathenv}
+\input{zsupport/mathvar}
+\input{zsupport/refer}
+\input{zsupport/table}
+\input{zsupport/misc}
+
+% https://www.overleaf.com/learn/latex/Questions/How_do_I_add_additional_author_names_and_affiliations_to_my_paper%3F
+\usepackage{authblk}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Project Milestone 2: Finding Optimal Taxation Policy With RL}
+
+\author[1]{Ardhito Nurhadyansah}
+\author[2]{Ian Suryadi Timothy H}
+\affil[1]{2106750206}
+\affil[2]{2106750875}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\begin{abstract}
+    In this project, we simulate the economic output, given a tax policy. This project is adapted from the work of \cite{zheng_2020_aieconomist}, where the model is comprises of two interconnected Markov Decision Process. The inner-loop MDP is the agents MDP, which have partial observations and interact to each other in a gather-and-build simulation. The outer-loop MDP models a social planner that find the optimal tax policy to maximize a social welfare function, which is formulated by a product of equality and economic productivity.
+\end{abstract}
+    
+\input{problem_formulation}
+
+\input{solution_design}
+
+\input{preliminary_analysis}
+
+\section{Citations and References}
+
+
+% \bibliography{main}
+\bibliography{ref/zheng_2020_aieconomist}
+\bibliographystyle{apalike}
+
+\end{document}

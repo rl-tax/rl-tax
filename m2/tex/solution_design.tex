@@ -1,0 +1,23 @@
+\section{Solution Design}
+A two-level deep reinforcement learning framework will be used, integrating the agents and planner's MDP.
+
+\subsection{Inner Loop (Agents' Learning)}
+\begin{itemize}
+    \item Agents interact in the environment and learn policies \( \pi_i \) using deep RL algorithms (e.g., PPO).
+    \item Their objective is to maximize the expected discounted return based on their MDP, with rewards that reflect changes in utility (coins versus labor cost).
+\end{itemize}
+
+\subsection{Outer Loop (Planner's Learning)}
+\begin{itemize}
+    \item The planner observes an aggregate state \( s_p \) (wealth distribution, productivity, etc.) and sets a tax schedule \( a_p \) for the upcoming tax period.
+    \item Its policy \( \pi_p \) is trained with deep RL methods to maximize improvements in social welfare:
+    \[
+    r_p = \text{swf}(s'_p) - \text{swf}(s_p).
+    \]
+\end{itemize}
+
+\subsection{Interaction Dynamics}
+\begin{itemize}
+    \item Influence of Planner on Agents: The tax schedule (action \( a_p \)) directly affects agents’ rewards by modifying post-tax incomes.
+    \item Influence of Agents on Planner: The agents’ adaptive responses under the new tax policy determine the next aggregate state \( s'_p \) that the planner observes.
+\end{itemize}
