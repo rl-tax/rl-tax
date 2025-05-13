@@ -1,0 +1,10 @@
+ai-economist==1.7.1
+gym==0.21
+tensorflow==1.14
+ray[rllib]==0.8.4
+numpy==1.21.0
+torch==1.6.0
+stable-baselines3==1.1.0
+
+
+

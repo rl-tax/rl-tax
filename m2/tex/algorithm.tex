@@ -1,0 +1,66 @@
+\section{Algorithm}
+\label{sec:algorithm}
+
+In our training algorithm, we emphasize several key aspects: sample collection and PPO (or another RL method) updates, two-phase training (initially training the agent alone in a free market, followed by a phase where the planner’s policy is included), as well as entropy schedules and parallel rollouts.
+
+\subsection{Overall Procedure}
+
+First, we initialize the agent and planner policy parameters (denoted by \(\theta\) and \(\phi\), respectively) using, for example, random network weights. Two separate buffers are also reset to record transitions: one for agent experiences and another for planner experiences. The training continues until a predefined stopping criterion is met (such as no further improvement in rewards).
+
+For each training iteration, the environment is reset to produce an initial state, along with observations and hidden states for both the agent and the planner. The procedure then proceeds over a specified sampling horizon \(\mathcal{H}\). At each timestep \(t\) within this horizon, the following steps occur:
+
+\begin{enumerate}[label=\textbf{Step \arabic*:}, leftmargin=2cm]
+    \item The agent observes its state \(o\) and, using its current policy \(\pi_\theta\), selects an action \(a\) while updating its hidden state \(h\).
+    \item At intervals defined by the tax period \(T\) (i.e., when \(t \mod T = 0\)), the planner, based on its observation \(o_p\) and hidden state \(h_p\), selects a new tax schedule \(\tau\) by invoking its policy \(\pi_\phi\). At other timesteps, the planner performs a no-op (but its hidden state is still updated).
+    \item The environment then takes a step using the chosen action and tax schedule, resulting in a new state \(s'\), updated observations \(o'\) for the agent and \(o'_p\) for the planner, and corresponding pre-tax rewards \(r\) (for the agent) and \(r_p\) (for the planner).
+    \item If the timestep is the last in the period (i.e., \(t \mod T = T-1\)), the environment applies taxes by updating the state and rewards accordingly.
+    \item The agent’s transition—comprising the observation, action, reward, and next observation—is logged to its buffer, and the planner’s transition (the planner’s observation, chosen tax schedule, planner reward, and next planner observation) is similarly stored.
+    \item The state variables \(s\), \(o\), and \(o_p\) are updated to their new values for the next iteration step.
+\end{enumerate}
+
+After completing the \(\mathcal{H}\)-step rollout, both policies are updated using an on-policy algorithm such as Proximal Policy Optimization (PPO) on the transitions stored in their respective buffers. The transition buffers are then cleared, and the next iteration begins.
+
+\subsection{Two-Phase Training}
+
+The training process is divided into two distinct phases:
+
+\textbf{Phase 1: Agent-only Training (Free Market)}\\[0.2cm]
+In this phase, only the agent is trained. Rollouts are collected in parallel from \(M\) replicas of the environment—each initialized in a no-tax configuration. For each replica, the agent executes \(T\) timesteps using policy \(\pi_\theta\) while storing the resulting experiences (observations, actions, and rewards). These experiences are then used to update the agent policy via PPO over one or more training epochs.
+
+\vspace{0.3cm}
+\textbf{Phase 2: Agents + Planner Co-adaptation}\\[0.2cm]
+Here, both the agent and the planner are trained concurrently. Environment replicas are now reset with tax actions enabled so that the planner can choose tax schedules. Each replica generates rollouts over \(T\) timesteps with both the agent policy \(\pi_\theta\) and the planner policy \(\pi_\phi\) active, and the collected experiences for both are stored. The agent policy is updated with PPO using its specific experiences, and similarly, the planner policy is updated using the planner’s transitions. Additionally, parameters such as the maximum allowable tax rates or the entropy coefficient (which encourages exploration) may be gradually annealed during training.
+
+\textbf{Why Two Phases?}\\[0.2cm]
+The two-phase approach addresses key challenges in the joint optimization of agent and planner policies:
+
+\begin{enumerate}
+    \item \textbf{Learning Stability:} During early training, an untrained planner may impose arbitrary high tax rates, creating noisy reward signals that make it difficult for agents to learn effective behaviors. By first training agents in a tax-free environment (Phase 1), they can learn basic economic strategies without this interference.
+    
+    \item \textbf{Smooth Tax Introduction:} When transitioning to Phase 2, we gradually introduce taxation through an annealing schedule. The maximum allowable tax rate starts at 10\% and is linearly increased to 100\% over the training period, allowing agents to adapt gradually to the tax environment.
+    
+    \item \textbf{Policy Exploration:} To handle the complex joint learning dynamics, we employ entropy regularization for the planner's policy:
+    \[
+    \text{entropy}(\pi) = -\mathbb{E}_{a\sim\pi(.|s)}[\log \pi(a|s)]
+    \]
+    This promotes exploration during the critical co-adaptation period.
+\end{enumerate}
+
+This approach ensures that agents first develop competent economic behaviors before introducing the complexity of tax policy optimization.
+
+
+\subsection{PPO and Entropy Regularization}
+
+For the policy updates, we use the standard PPO objective function:
+\[
+L(\theta) = \mathbb{E}_t\left[\min\Big(r_t(\theta) A_t,\; \mathrm{clip}\big(r_t(\theta), 1-\epsilon, 1+\epsilon\big) A_t\Big)\right],
+\]
+where
+\[
+r_t(\theta) = \frac{\pi_\theta(a_t \mid o_t)}{\pi_{\theta_{\text{old}}}(a_t \mid o_t)}
+\]
+is the probability ratio, and \(A_t\) denotes the advantage estimate. An entropy bonus term, \(\alpha_H \,\mathcal{H}[\pi]\), is also added to promote exploration, with the coefficient \(\alpha_H\) gradually reduced over time.
+
+\subsection{Sample Efficiency and Rollouts}
+
+In each training iteration, we can collect \(M \times T\) transitions. For example, if we use \(M = 30\) parallel environment replicas and \(T = 200\) timesteps per replica, approximately 6000 agent transitions are collected each iteration. Although the planner’s actions might occur less frequently (possibly once every \(k\) timesteps), its transitions are captured each time it acts.

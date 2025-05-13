@@ -1,0 +1,33 @@
+\section{Modeling}
+\label{sec:modeling}
+
+In this section, we describe the overall system design with a focus on:
+\begin{enumerate}
+    \item The policy network architectures used by agents and the planner.
+    \item The key hyperparameters chosen and their rationale (e.g., learning rates, network sizes).
+    \item References to how the environment’s code and classes will be organized in our project.
+\end{enumerate}
+
+\subsection{Architecture of the Policy Networks}
+
+\paragraph{Agent Policy Network.}
+Our agents each implement a policy \(\pi(a \mid o)\) via a neural network that processes an observation \(o\) and outputs a distribution over possible actions \(a\). Observations include:
+\begin{itemize}
+    \item \emph{Spatial data}: local $N\times N$ grid cells (near the agent) indicating terrain, resources, or other agents.
+    \item \emph{Non-spatial data}: agent inventory (e.g., wood, stone, coin), skill level, and market/trading information.
+    \item \emph{Planner signals}: the bracketed tax schedule or agent memories, used especially in phase 2 when the planner's tax is being activated.
+\end{itemize}
+We will feed the spatial data into a small convolutional stack (\(2\)–\(3\) conv layers), flatten it, then concatenate with the non-spatial vector. After fully connected (FC) layers, an output layer produces action logits. We include an LSTM or GRU layer to help with partial observability and history.
+
+\paragraph{Planner Policy Network.}
+If the simulation includes a tax planner (Phase 2), it observes aggregated economic metrics (wealth distribution, Gini, average labor, etc.) and outputs a set of discrete bracketed tax rates \(\{\tau_b\}\). We will use a simple FC architecture with a final multi-branch head (one branch per bracket). 
+
+\subsection{Key Hyperparameters and Rationale}
+
+\begin{itemize}
+    \item \textbf{Batch Size \& Rollouts}: According to the paper, we run multiple environment replicas in parallel (e.g., 16–30) for sample efficiency. Each replica collects around 200 steps before an update. But in regard of the compute availability, this might be adjusted.
+    \item \textbf{Discount Factor} (\(\gamma\)): Close to 1 (e.g., \(>=0.98\)–\(0.999\)) to handle multi-step horizons.
+    \item \textbf{Entropy Regularization}: Encourages exploration; a small coefficient (0.01–0.05) for agents, and often a slightly larger one for the planner to make the agents not become too "excited" when the tax applied.
+\end{itemize}
+
+

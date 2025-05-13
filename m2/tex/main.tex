@@ -1,6 +1,6 @@
 \documentclass{article}
 % if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
+    % \PassOptionsToPackage{numbers, compress}{natbib}
 % before loading project
 % ready for submission
 \usepackage[preprint]{zsupport/project}
@@ -25,6 +25,12 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
+\usepackage{listings}
+\usepackage{algorithm}     
+\usepackage{algorithmic} 
+
+\usepackage{float}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{Project Milestone 2: Finding Optimal Taxation Policy With RL}
 
@@ -38,7 +44,7 @@
 \maketitle
 
 \begin{abstract}
-    In this project, we simulate the economic output, given a tax policy. This project is adapted from the work of \cite{zheng_2020_aieconomist}, where the model is comprises of two interconnected Markov Decision Process. The inner-loop MDP is the agents MDP, which have partial observations and interact to each other in a gather-and-build simulation. The outer-loop MDP models a social planner that find the optimal tax policy to maximize a social welfare function, which is formulated by a product of equality and economic productivity.
+    In this project, we simulate the economic output, given a tax policy. This project is adapted from the work of (Zheng et al., 2020) , where the model is comprises of two interconnected Markov Decision Process. The inner-loop MDP is the agents MDP, which have partial observations and interact to each other in a gather-and-build simulation. The outer-loop MDP models a social planner that find the optimal tax policy to maximize a social welfare function, which is formulated by a product of equality and economic productivity.
 \end{abstract}
     
 \input{problem_formulation}
@@ -47,11 +53,19 @@
 
 \input{preliminary_analysis}
 
+
+\input{modeling}
+\input{algorithm}
+\input{experiment}
+
 \section{Citations and References}
 
 
 % \bibliography{main}
-\bibliography{ref/zheng_2020_aieconomist}
-\bibliographystyle{apalike}
+% \bibliography{ref/zheng_2020_aieconomist}
+% \bibliographystyle{apalike}
+Zheng, S., Trott, A., Srinivasa, S., Naik, N., Gruesbeck, M., Parkes, D. C., & Socher, R. (2020). The AI Economist: Improving equality and productivity with AI-driven tax policies. arXiv. https://arxiv.org/abs/2004.13332
+
+Schulman, J., Wolski, F., Dhariwal, P., Radford, A., & Klimov, O. (2017). Proximal Policy Optimization Algorithms. arXiv. https://arxiv.org/abs/1707.06347
 
 \end{document}
